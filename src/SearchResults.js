@@ -4,12 +4,10 @@ import './SearchResults.scss'
 
 export default class SearchResults extends Component {
     constructor(props) {
-        super(props)
-
+        super(props);
+        console.log(props);
         this.state = {
             users: [],
-            searchTerm: '',
-            lastSearchTerm: ''
         }
     }
 
@@ -25,30 +23,30 @@ export default class SearchResults extends Component {
         })
     }
 
-    saveInput = e => {
-        this.setState({
-            searchTerm: e.target.value
-        })
-    }
+    lastSearchFor = null
 
-    handleSubmit = e => {
-        e.preventDefault();
-        this.setState({
-            lastSearchTerm: this.state.searchTerm
-        })
+    shouldComponentUpdate(nextProps, nextState) {
+        if (nextProps.lastSearchTerm === this.lastSearchFor) {
+            return false;
+        } else {
+            this.lastSearchFor = nextProps.lastSearchTerm;
+            return true
+        }
+
     }
 
     render() {
+        console.log('...RENDERING...');
         let allUsers = this.state.users
-            .filter(user => user.name.toLocaleLowerCase().indexOf(this.state.lastSearchTerm.toLocaleLowerCase()) !== -1 ||
-                user.email.toLocaleLowerCase().indexOf(this.state.lastSearchTerm.toLocaleLowerCase()) !== -1)
+            .filter(user => user.name.toLocaleLowerCase().indexOf(this.props.lastSearchTerm.toLocaleLowerCase()) !== -1 ||
+                user.email.toLocaleLowerCase().indexOf(this.props.lastSearchTerm.toLocaleLowerCase()) !== -1)
             .map((user, i) => <User key={i} id={user.id} name={user.name} email={user.email} />);
 
         return (
             <div className="container">
-                <form action="#" onSubmit={this.searchUser}>
-                    <input className="text-input" type="text" placeholder="Enter search term" onChange={this.saveInput} value={this.state.input} />
-                    <input className="submit-button" type="submit" value="Search" onClick={this.handleSubmit} />
+                <form onSubmit={this.props.handleSubmit}>
+                    <input className="text-input" type="text" placeholder="Enter search term" onChange={this.props.updateSearchTerm} />
+                    <input className="submit-button" type="submit" value="Search" />
                 </form>
                 <table>
                     <thead>
